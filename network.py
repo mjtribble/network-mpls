@@ -83,7 +83,7 @@ class NetworkPacket:
 # Implements a network layer packet
 # NOTE: You will need to extend this class for the packet to include
 # the fields necessary for the completion of this assignment.
-class MPLSPacket:
+class MPLSFrame:
     # packet encoding lengths
     dst_S_length = 5
 
@@ -200,9 +200,8 @@ class Router:
                 self.process_network_packet(p, i)
             elif fr.type_S == "MPLS":
                 # TODO: handle MPLS frames
-                # m_fr = MPLSFrame.from_byte_S(pkt_S) # parse a frame out
+                m_fr = MPLSFrame.from_byte_S(pkt_S) # parse a frame out
                 # for now, we just relabel the packet as an MPLS frame without encapsulation
-                m_fr = p
                 # send the MPLS frame for processing
                 self.process_MPLS_frame(m_fr, i)
             else:
@@ -212,9 +211,13 @@ class Router:
     #  @param p Packet to forward
     #  @param i Incoming interface number for packet p
     def process_network_packet(self, pkt, i):
-        # TODO: encapsulate the packet in an MPLS frame based on self.encap_tbl_D
-        # for now, we just relabel the packet as an MPLS frame without encapsulation
-        m_fr = pkt
+
+        destination = pkt.dst
+
+        # checks the encapsulation table to see if this is the first hop based on the current router and the destination
+        if self.encap_tbl_D[destination] is self.name:
+
+        m_fr = MPLSFrame(destination, NetworkPacket.to_byte_S(pkt))
         print('%s: encapsulated packet "%s" as MPLS frame "%s"' % (self, pkt, m_fr))
         # send the encapsulated packet for processing as MPLS frame
         self.process_MPLS_frame(m_fr, i)

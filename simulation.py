@@ -32,8 +32,8 @@ if __name__ == '__main__':
 
     # checks the network packet destination (key)
     # determines which router need sot encapsulate the packet as MPLS
-    encap_tbl_D = {2: 'A',
-                   1: 'B'}
+    encap_tbl_D = {'H2': 'RA',
+                   'H1': 'RB'}
 
     frwd_tbl_D = {}
     decap_tbl_D = {}
