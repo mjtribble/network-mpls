@@ -135,7 +135,7 @@ class Host:
     # @param data_S: data being transmitted to the network layer
     # @param priority: packet priority
     def udt_send(self, dst, data_S, priority=0):
-        pkt = NetworkPacket(dst, data_S)
+        pkt = NetworkPacket(dst, data_S, priority)
         print('%s: sending packet "%s" with priority %d' % (self, pkt, priority))
         # encapsulate network packet in a link frame (usually would be done by the OS)
         fr = LinkFrame('Network', pkt.to_byte_S())
@@ -198,9 +198,11 @@ class Router:
             fr_S = self.intf_L[i].get('in')  # get frame from interface i
             if fr_S is None:
                 continue  # no frame to process yet
+
             # decapsulate the packet
             fr = LinkFrame.from_byte_S(fr_S)
             pkt_S = fr.data_S
+
             # process the packet as network, or MPLS
             if fr.type_S == "Network":
                 p = NetworkPacket.from_byte_S(pkt_S)  # parse a packet out
@@ -248,13 +250,22 @@ class Router:
 
         label = str(m_fr.label)
         destination = m_fr.dst
+        fwd_interface = self.frwd_tbl_D[label][2]
 
         # checks to see if this is the last hop, if it is it will call the decapsulate and forward onto the destination
         if self.decap_tbl_D[destination] is self:
-            pass
-            # decapsulate(m_fr), need to write a function in the MPLS class to do this I think?
 
-        fwd_interface = self.frwd_tbl_D[label][2]
+            pkt_S = m_fr.data_S
+
+            try:
+                fr = LinkFrame('Network', net_pak)
+                self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
+                print('%s: forwarding packet "%s" from interface %d to %d' % (self, fr, i, 1))
+            except queue.Full:
+                print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
+                pass
+
+
         try:
             fr = LinkFrame('MPLS', m_fr.to_byte_S())
             self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
