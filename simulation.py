@@ -72,9 +72,10 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    for i in range(5):
-        priority = i % 2
-        host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
+    # for i in range(5):
+    #     priority = i % 2
+    #     host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
+    host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, 1)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)

@@ -230,7 +230,7 @@ class Router:
 
         # checks the encapsulation table to see if this is the first hop based on the current router and the destination
         if self.encap_tbl_D[destination] is self.name:
-            m_fr = MPLSFrame(label, destination, NetworkPacket.to_byte_S(pkt))
+            m_fr = MPLSFrame(label, destination, MPLSFrame.to_byte_S(pkt))
             print('%s: encapsulated packet "%s" as MPLS frame "%s"' % (self, pkt, m_fr))
             # send the encapsulated packet for processing as MPLS frame
             self.process_MPLS_frame(m_fr, i)
@@ -256,7 +256,7 @@ class Router:
         fwd_interface = self.frwd_tbl_D[label][2]
 
         try:
-            fr = LinkFrame('Network', m_fr.to_byte_S())
+            fr = LinkFrame('MPLS', m_fr.to_byte_S())
             self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
             print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
         except queue.Full:
