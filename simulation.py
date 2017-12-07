@@ -28,11 +28,11 @@ if __name__ == '__main__':
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface ]
-    frwd_tbl_DA = {10: [10, 'H1', 0],
-                   20: [20, 'H2', 1]}
+    frwd_tbl_DA = {'10': ['10', 'H1', 0],
+                   '20': ['20', 'H2', 1]}
 
-    frwd_tbl_DB = {10: [10, 'H1', 0],
-                   20: [20, 'H2', 1]}
+    frwd_tbl_DB = {'10': ['10', 'H1', 0],
+                   '20': ['20', 'H2', 1]}
 
     # table used to decapsulate network packets from MPLS frames
     decap_tbl_D = {'H1': 'RA',
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     # for i in range(5):
     #     priority = i % 2
     #     host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
-    host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, 1)
+    host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % 1, 1)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)
