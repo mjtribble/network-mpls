@@ -19,28 +19,37 @@ if __name__ == '__main__':
     object_L.append(host_2)
 
     # create routers and routing tables for connected clients (subnets)
-    encap_tbl_D = {}  # table used to encapsulate network packets into MPLS frames
-    frwd_tbl_D = {}  # table used to forward MPLS frames
-    decap_tbl_D = {}  # table used to decapsulate network packets from MPLS frames
-    router_a = Router(name='RA',
-                      intf_capacity_L=[500, 500],
-                      encap_tbl_D=encap_tbl_D,
-                      frwd_tbl_D=frwd_tbl_D,
-                      decap_tbl_D=decap_tbl_D,
-                      max_queue_size=router_queue_size)
-    object_L.append(router_a)
 
+    # table used to encapsulate network packets into MPLS frames
     # checks the network packet destination (key)
     # determines which router need sot encapsulate the packet as MPLS
     encap_tbl_D = {'H2': 'RA',
                    'H1': 'RB'}
 
-    frwd_tbl_D = {}
-    decap_tbl_D = {}
+    # tables used to forward MPLS frames
+    # { in-label: [ out-label, destination, out-interface ]
+    frwd_tbl_DA = {10: [10, 'H1', 0],
+                   20: [20, 'H2', 1]}
+
+    frwd_tbl_DB = {10: [10, 'H1', 0],
+                   20: [20, 'H2', 1]}
+
+    # table used to decapsulate network packets from MPLS frames
+    decap_tbl_D = {'H1': 'RA',
+                   'H2': 'RB'}
+
+    router_a = Router(name='RA',
+                      intf_capacity_L=[500, 500],
+                      encap_tbl_D=encap_tbl_D,
+                      frwd_tbl_D=frwd_tbl_DA,
+                      decap_tbl_D=decap_tbl_D,
+                      max_queue_size=router_queue_size)
+    object_L.append(router_a)
+
     router_b = Router(name='RB',
                       intf_capacity_L=[500, 100],
                       encap_tbl_D=encap_tbl_D,
-                      frwd_tbl_D=frwd_tbl_D,
+                      frwd_tbl_D=frwd_tbl_DB,
                       decap_tbl_D=decap_tbl_D,
                       max_queue_size=router_queue_size)
     object_L.append(router_b)
