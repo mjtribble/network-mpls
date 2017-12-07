@@ -254,18 +254,18 @@ class Router:
             pass
             # decapsulate(m_fr), need to write a function in the MPLS class to do this I think?
 
-        fwd_interface = self.frwd_tbl_D[label]
+        fwd_interface = self.frwd_tbl_D[label][2]
         try:
             fr = LinkFrame('MPLS', m_fr.to_byte_S())
             self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
             print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
         except queue.Full:
-            print('%s: frame "%s" lost on interface %d' % (self, p, i))
+            print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
             pass
         
     # thread target for the host to keep forwarding data
     def run(self):
-        print(threading.currentThread().getName() + ': Starting')g
+        print(threading.currentThread().getName() + ': Starting')
         while True:
             self.process_queues()
             if self.stop:
