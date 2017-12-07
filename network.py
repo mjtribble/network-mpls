@@ -84,7 +84,7 @@ class Host:
     def __init__(self, addr):
         self.addr = addr
         self.intf_L = [Interface()]
-        self.stop = False #for thread termination
+        self.stop = False  # for thread termination
     
     # called when printing the object
     def __str__(self):
@@ -109,7 +109,7 @@ class Host:
             return
         # decapsulate the network packet
         fr = LinkFrame.from_byte_S(fr_S)
-        assert(fr.type_S == 'Network') #should be receiving network packets by hosts
+        assert(fr.type_S == 'Network')  # should be receiving network packets by hosts
         pkt_S = fr.data_S
         print('%s: received packet "%s"' % (self, pkt_S))
        
@@ -135,11 +135,11 @@ class Router:
     # @param decap_tbl_D: table used to decapsulate network packets from MPLS frames
     # @param max_queue_size: max queue length (passed to Interface)
     def __init__(self, name, intf_capacity_L, encap_tbl_D, frwd_tbl_D, decap_tbl_D, max_queue_size):
-        self.stop = False #for thread termination
+        self.stop = False  # for thread termination
         self.name = name
-        #create a list of interfaces
+        # create a list of interfaces
         self.intf_L = [Interface(max_queue_size, intf_capacity_L[i]) for i in range(len(intf_capacity_L))]
-        #save MPLS tables
+        # save MPLS tables
         self.encap_tbl_D = encap_tbl_D
         self.frwd_tbl_D = frwd_tbl_D
         self.decap_tbl_D = decap_tbl_D
