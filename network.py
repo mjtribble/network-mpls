@@ -58,8 +58,7 @@ class NetworkPacket:
         self.dst = dst
         self.data_S = data_S
         self.priority = priority
-        # TODO: add priority to the packet class
-        
+
     # called when printing the object
     def __str__(self):
         return self.to_byte_S()
@@ -75,9 +74,10 @@ class NetworkPacket:
     # @param byte_S: byte string representation of the packet
     @classmethod
     def from_byte_S(cls, byte_S):
-        dst = byte_S[0 : NetworkPacket.dst_S_length].strip('0')
-        data_S = byte_S[NetworkPacket.dst_S_length : ]        
-        return cls(dst, data_S)
+        dst = byte_S[0: NetworkPacket.dst_S_length].strip('0')
+        priority = byte_S[0: NetworkPacket.priority_S_length].strip('0')
+        data_S = byte_S[NetworkPacket.dst_S_length: ]
+        return cls(dst, data_S, priority)
 
 
 # Implements a network layer packet
@@ -88,12 +88,10 @@ class MPLSPacket:
     dst_S_length = 5
 
     # @param dst: address of the destination host
-    # @param data_S: packet payload
-    # @param priority: packet priority
-    def __init__(self, dst, data_S, priority=0):
+    # @param data_S: encoded network packet
+    def __init__(self, dst, data_S):
         self.dst = dst
         self.data_S = data_S
-        # TODO: add priority to the packet class
 
     # called when printing the object
     def __str__(self):
@@ -238,9 +236,9 @@ class Router:
         
     # thread target for the host to keep forwarding data
     def run(self):
-        print (threading.currentThread().getName() + ': Starting')
+        print(threading.currentThread().getName() + ': Starting')
         while True:
             self.process_queues()
             if self.stop:
-                print (threading.currentThread().getName() + ': Ending')
+                print(threading.currentThread().getName() + ': Ending')
                 return 
