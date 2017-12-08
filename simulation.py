@@ -23,18 +23,20 @@ if __name__ == '__main__':
     # table used to encapsulate network packets into MPLS frames
     # checks the network packet destination (key)
     # determines which router need sot encapsulate the packet as MPLS
+    # {destination: first hop router}
     encap_tbl_D = {'H2': 'RA',
                    'H1': 'RB'}
 
     # tables used to forward MPLS frames
-    # { in-label: [ out-label, destination, out-interface ]
-    frwd_tbl_DA = {'10': ['10', 'H1', 0],
-                   '20': ['20', 'H2', 1]}
+    # { in-label: [ out-label, destination, out-interface, in-interface ]
+    frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
+                   '20': ['20', 'H2', 1, 0]}
 
-    frwd_tbl_DB = {'10': ['10', 'H1', 0],
-                   '20': ['20', 'H2', 1]}
+    frwd_tbl_DB = {'10': ['10', 'H1', 0, 1],
+                   '20': ['20', 'H2', 1, 0]}
 
     # table used to decapsulate network packets from MPLS frames
+    # {destination: last hop router}
     decap_tbl_D = {'H1': 'RA',
                    'H2': 'RB'}
 
@@ -72,10 +74,9 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    # for i in range(5):
-    #     priority = i % 2
-    #     host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
-    host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % 1, 1)
+    for i in range(5):
+        priority = i % 2
+        host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)

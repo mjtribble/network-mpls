@@ -80,11 +80,10 @@ class NetworkPacket:
         return cls(dst, data_S, priority)
 
 
-# Implements a network layer packet
-# NOTE: You will need to extend this class for the packet to include
-# the fields necessary for the completion of this assignment.
+# Implements a MPLS frame to encapsulate a network packet
 class MPLSFrame:
-    # packet encoding lengths
+
+    # frame encoding lengths
     dst_S_length = 5
     label_S_length = 2
 
@@ -100,15 +99,15 @@ class MPLSFrame:
     def __str__(self):
         return self.to_byte_S()
 
-    # convert packet to a byte string for transmission over links
+    # convert frame to a byte string for transmission over links
     def to_byte_S(self):
         byte_S = str(self.label).zfill(self.label_S_length)
         byte_S += str(self.dst).zfill(self.dst_S_length)
         byte_S += self.data_S
         return byte_S
 
-    # extract a packet object from a byte string
-    # @param byte_S: byte string representation of the packet
+    # extract a frame object from a byte string
+    # @param byte_S: byte string representation of the frame
     @classmethod
     def from_byte_S(cls, byte_S):
         label = byte_S[0: MPLSFrame.label_S_length]
@@ -223,8 +222,8 @@ class Router:
         destination = pkt.dst
         label = None
 
-        # creates a numerical label for the MPLSFrame to check in the MPLS forwarding table
         # Todo: extend this in part 3 when dealing with priority. Change label to look at destination and priority
+        # creates a numerical label for the MPLSFrame to check in the MPLS forwarding table
         if destination == 'H1':
             label = 10
         if destination == 'H2':
@@ -234,8 +233,11 @@ class Router:
 
         # checks the encapsulation table to see if this is the first hop based on the current router and the destination
         if self.encap_tbl_D[destination] is self.name:
+
+            # create a MPLS frame
             m_fr = MPLSFrame(label, destination, NetworkPacket.to_byte_S(pkt))
             print('%s: encapsulated packet "%s" as MPLS frame "%s"' % (self, pkt, m_fr))
+
             # send the encapsulated packet for processing as MPLS frame
             self.process_MPLS_frame(m_fr, i)
         else:
@@ -245,27 +247,33 @@ class Router:
     #  @param m_fr: MPLS frame to process
     #  @param i Incoming interface number for the frame
     def process_MPLS_frame(self, m_fr, i):
-        print('%s: processing MPLS frame "%s"' % (self, m_fr))
 
         label = str(m_fr.label)
         destination = m_fr.dst
+
+        print('%s: processing MPLS frame "%s"' % (self, m_fr))
+
+        # grab the out interface from the forward table based on the frame's label
         fwd_interface = self.frwd_tbl_D[label][2]
 
         # If this router is the last hop to the destination,
         # decapsulate the frame,
-        # forward to destination
+        # forward to destination as a network packet
         if self.decap_tbl_D[destination] == str(self):
             pkt_S = m_fr.data_S
 
             try:
+                # create a new network LinkFrame and forward
                 fr = LinkFrame('Network', pkt_S)
                 self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
                 print('%s: forwarding packet "%s" from interface %d to %d' % (self, fr, i, 1))
             except queue.Full:
                 print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
                 pass
+        # not the last hop router
         else:
             try:
+                # create a new mpls frame and forward
                 fr = LinkFrame('MPLS', m_fr.to_byte_S())
                 self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
                 print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
