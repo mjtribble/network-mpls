@@ -39,6 +39,12 @@ if __name__ == '__main__':
     frwd_tbl_DB = {'10': ['10', 'H1', 0, 1],
                    '20': ['20', 'H2', 1, 0]}
 
+    frwd_tbl_DC = {'10': ['10', 'H1', 0, 1],
+                   '20': ['20', 'H2', 1, 0]}
+
+    frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
+                   '20': ['20', 'H2', 1, 0]}
+
     # table used to decapsulate network packets from MPLS frames
     # {destination: last hop router}
     decap_tbl_D = {'H1': 'RD',
@@ -64,7 +70,7 @@ if __name__ == '__main__':
     router_c = Router(name='RC',
                       intf_capacity_L=[500, 100],
                       encap_tbl_D=encap_tbl_D,
-                      frwd_tbl_D=frwd_tbl_DB,
+                      frwd_tbl_D=frwd_tbl_DC,
                       decap_tbl_D=decap_tbl_D,
                       max_queue_size=router_queue_size)
     object_L.append(router_c)
@@ -72,7 +78,7 @@ if __name__ == '__main__':
     router_d = Router(name='RD',
                       intf_capacity_L=[500, 100],
                       encap_tbl_D=encap_tbl_D,
-                      frwd_tbl_D=frwd_tbl_DB,
+                      frwd_tbl_D=frwd_tbl_DD,
                       decap_tbl_D=decap_tbl_D,
                       max_queue_size=router_queue_size)
     object_L.append(router_d)
@@ -84,7 +90,13 @@ if __name__ == '__main__':
     # add all the links - need to reflect the connectivity in cost_D tables above
     link_layer.add_link(Link(host_1, 0, router_a, 0))
     link_layer.add_link(Link(router_a, 1, router_b, 0))
-    link_layer.add_link(Link(router_b, 1, host_2, 0))
+    link_layer.add_link(Link(router_b, 1, router_d, 0))
+    link_layer.add_link(Link(router_d, 1, host_3, 0))
+
+    link_layer.add_link(Link(host_2, 0, router_a, 2))
+    link_layer.add_link(Link(router_a, 3, router_c, 0))
+    link_layer.add_link(Link(router_c, 1, router_d, 2))
+    link_layer.add_link(Link(router_d, 1, host_3, 0))
 
     # start all the objects
     thread_L = []
