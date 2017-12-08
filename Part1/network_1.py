@@ -260,11 +260,12 @@ class Router:
         # decapsulate the frame,
         # forward to destination as a network packet
         if self.decap_tbl_D[destination] == str(self):
-            pkt_S = m_fr.data_S
+            pkt_B = m_fr.data_S
+            print('%s: decapsulating frame "%s" back to Network packet "%s"' % (self, m_fr, pkt_B))
 
             try:
                 # create a new network LinkFrame and forward
-                fr = LinkFrame('Network', pkt_S)
+                fr = LinkFrame('Network', pkt_B)
                 self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
                 print('%s: forwarding packet "%s" from interface %d to %d' % (self, fr, i, 1))
             except queue.Full:
