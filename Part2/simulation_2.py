@@ -7,7 +7,7 @@ from copy import deepcopy
 
 # configuration parameters
 router_queue_size = 0  # 0 means unlimited
-simulation_time = 10  # give the network sufficient time to execute transfers
+simulation_time = 30  # give the network sufficient time to execute transfers
 
 if __name__ == '__main__':
     object_L = []  # keeps track of objects, so we can kill their threads at the end
@@ -33,20 +33,16 @@ if __name__ == '__main__':
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
     frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 0],
-                   '20': ['20', 'H2', 2, 3],
-                   '30': ['30', 'H3', 3, 2]}
+                   '30': ['30', 'H3', 1, 1]}
 
-    frwd_tbl_DB = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 0]}
+    frwd_tbl_DB = {'10': ['10', 'RA', 0, 1],
+                   '30': ['30', 'RD', 1, 0]}
 
-    frwd_tbl_DC = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 2]}
+    frwd_tbl_DC = {'10': ['10', 'RA', 0, 1],
+                   '30': ['30', 'RD', 1, 0]}
 
     frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 0],
-                   '20': ['20', 'H2', 1, 2],
-                   '30': ['30', 'H3', 2, 1]}
+                   '30': ['30', 'H3', 1, 1]}
 
     # table used to decapsulate network packets from MPLS frames
     # {destination: last hop router}
@@ -96,10 +92,10 @@ if __name__ == '__main__':
     link_layer.add_link(Link(router_b, 1, router_d, 0))
     link_layer.add_link(Link(router_d, 1, host_3, 0))
 
-    # link_layer.add_link(Link(host_2, 0, router_a, 0))
-    # link_layer.add_link(Link(router_a, 1, router_c, 0))
-    # link_layer.add_link(Link(router_c, 1, router_d, 0))
-    # link_layer.add_link(Link(router_d, 1, host_3, 0))
+    link_layer.add_link(Link(host_2, 0, router_a, 0))
+    link_layer.add_link(Link(router_a, 1, router_c, 0))
+    link_layer.add_link(Link(router_c, 1, router_d, 0))
+    link_layer.add_link(Link(router_d, 1, host_3, 0))
 
     # start all the objects
     thread_L = []
@@ -110,9 +106,12 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    # for i in range(5):
-    #     priority = i % 2
-    host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 1, 1)
+    for i in range(2):
+        priority = i % 2
+        host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % i, priority)
+    for i in range(2):
+        priority = i % 2
+        host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % i, priority)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)

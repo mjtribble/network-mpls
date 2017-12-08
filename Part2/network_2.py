@@ -232,8 +232,6 @@ class Router:
             label = 30
         else:
             print('Invalid destination', destination)
-        print (self.name)
-        print(self.encap_tbl_D[destination])
         # checks the encapsulation table to see if this is the first hop based on the current router and the destination
         if self.encap_tbl_D[destination] is self.name:
 
