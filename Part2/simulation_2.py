@@ -32,18 +32,21 @@ if __name__ == '__main__':
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
-    #TODO: Add forward tables for router C and D
     frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H2', 1, 0]}
+                   '20': ['20', 'H3', 1, 0],
+                   '10': ['10', 'H2', 3, 2],
+                   '20': ['10', 'H3', 2, 3]}
 
     frwd_tbl_DB = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H2', 1, 0]}
+                   '20': ['20', 'H3', 1, 0]}
 
     frwd_tbl_DC = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H2', 1, 0]}
+                   '20': ['20', 'H3', 1, 2]}
 
     frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H2', 1, 0]}
+                   '20': ['20', 'H3', 1, 0],
+                   '10': ['10', 'H2', 2, 1],
+                   '20': ['10', 'H3', 1, 2]}
 
     # table used to decapsulate network packets from MPLS frames
     # {destination: last hop router}
