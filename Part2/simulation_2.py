@@ -26,36 +26,36 @@ if __name__ == '__main__':
     # checks the network packet destination (key)
     # determines which router need sot encapsulate the packet as MPLS
     # {destination: first hop router}
-    encap_tbl_D = {'H2': 'RA',
-                   'H1': 'RA',
-                   'H3': 'RD'}
+    encap_tbl_D = {'H3': 'RA',
+                   'H2': 'RD',
+                   'H1': 'RD'}
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
     frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H3', 1, 0],
-                   '10': ['10', 'H2', 3, 2],
-                   '20': ['10', 'H3', 2, 3]}
+                   '30': ['30', 'H3', 1, 0],
+                   '20': ['20', 'H2', 2, 3],
+                   '30': ['30', 'H3', 3, 2]}
 
     frwd_tbl_DB = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H3', 1, 0]}
+                   '30': ['30', 'H3', 1, 0]}
 
     frwd_tbl_DC = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H3', 1, 2]}
+                   '30': ['30', 'H3', 1, 2]}
 
     frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
-                   '20': ['20', 'H3', 1, 0],
-                   '10': ['10', 'H2', 2, 1],
-                   '20': ['10', 'H3', 1, 2]}
+                   '30': ['30', 'H3', 1, 0],
+                   '20': ['20', 'H2', 1, 2],
+                   '30': ['30', 'H3', 2, 1]}
 
     # table used to decapsulate network packets from MPLS frames
     # {destination: last hop router}
-    decap_tbl_D = {'H1': 'RD',
-                   'H2': 'RD',
-                   'H3': 'RA'}
+    decap_tbl_D = {'H1': 'RA',
+                   'H2': 'RA',
+                   'H3': 'RD'}
 
     router_a = Router(name='RA',
-                      intf_capacity_L=[500, 500],
+                      intf_capacity_L=[500, 100],
                       encap_tbl_D=encap_tbl_D,
                       frwd_tbl_D=frwd_tbl_DA,
                       decap_tbl_D=decap_tbl_D,
@@ -96,10 +96,10 @@ if __name__ == '__main__':
     link_layer.add_link(Link(router_b, 1, router_d, 0))
     link_layer.add_link(Link(router_d, 1, host_3, 0))
 
-    link_layer.add_link(Link(host_2, 0, router_a, 2))
-    link_layer.add_link(Link(router_a, 3, router_c, 0))
-    link_layer.add_link(Link(router_c, 1, router_d, 2))
-    link_layer.add_link(Link(router_d, 1, host_3, 0))
+    # link_layer.add_link(Link(host_2, 0, router_a, 0))
+    # link_layer.add_link(Link(router_a, 1, router_c, 0))
+    # link_layer.add_link(Link(router_c, 1, router_d, 0))
+    # link_layer.add_link(Link(router_d, 1, host_3, 0))
 
     # start all the objects
     thread_L = []
@@ -110,9 +110,9 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    for i in range(5):
-        priority = i % 2
-        host_1.udt_send('H2', 'MESSAGE_%d_FROM_H1' % i, priority)
+    # for i in range(5):
+    #     priority = i % 2
+    host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 1, 1)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)
