@@ -17,6 +17,8 @@ if __name__ == '__main__':
     object_L.append(host_1)
     host_2 = Host('H2')
     object_L.append(host_2)
+    host_3 = Host('H3')
+    object_L.append(host_3)
 
     # create routers and routing tables for connected clients (subnets)
 
