@@ -245,34 +245,33 @@ class Router:
     #  @param m_fr: MPLS frame to process
     #  @param i Incoming interface number for the frame
     def process_MPLS_frame(self, m_fr, i):
-        # DONE/TODO: implement MPLS forward, or MPLS decapsulation if this is the last hop router for the path
         print('%s: processing MPLS frame "%s"' % (self, m_fr))
 
         label = str(m_fr.label)
         destination = m_fr.dst
         fwd_interface = self.frwd_tbl_D[label][2]
 
-        # checks to see if this is the last hop, if it is it will call the decapsulate and forward onto the destination
-        if self.decap_tbl_D[destination] is self:
-
+        # If this router is the last hop to the destination,
+        # decapsulate the frame,
+        # forward to destination
+        if self.decap_tbl_D[destination] == str(self):
             pkt_S = m_fr.data_S
 
             try:
-                fr = LinkFrame('Network', net_pak)
+                fr = LinkFrame('Network', pkt_S)
                 self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
                 print('%s: forwarding packet "%s" from interface %d to %d' % (self, fr, i, 1))
             except queue.Full:
                 print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
                 pass
-
-
-        try:
-            fr = LinkFrame('MPLS', m_fr.to_byte_S())
-            self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
-            print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
-        except queue.Full:
-            print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
-            pass
+        else:
+            try:
+                fr = LinkFrame('MPLS', m_fr.to_byte_S())
+                self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
+                print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
+            except queue.Full:
+                print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
+                pass
         
     # thread target for the host to keep forwarding data
     def run(self):
