@@ -90,10 +90,11 @@ class Link:
                           % (
                           self, pkt_S, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time(),
                           intf_a.out_queue.qsize()))
-                    
-                    #iterates through a queue and prints the priorities
 
+                    #iterates through a queue and prints the priorities
                     for element in list(intf_a.out_queue.queue):
+                        #checks to see if packet is a network packet or mpls frame
+                        #will print the priority based on which on it is
                         if element[0:1] is 'N':
                             print('\t' + element[7:8])
                         else:
