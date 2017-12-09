@@ -54,7 +54,7 @@ class NetworkPacket:
     # @param dst: address of the destination host
     # @param data_S: packet payload
     # @param priority: packet priority
-    def __init__(self, dst, data_S, priority=0):
+    def __init__(self, dst, data_S, priority):
         self.dst = dst
         self.data_S = data_S
         self.priority = priority
@@ -278,7 +278,7 @@ class Router:
                 # create a new mpls frame and forward
                 fr = LinkFrame('MPLS', m_fr.to_byte_S())
                 self.intf_L[fwd_interface].put(fr.to_byte_S(), 'out', True)
-                print('%s: forwarding frame "%s" from interface %d to %d' % (self, fr, i, 1))
+                print('%s: forwarding frame "%s" from interface %d to %d ' % (self, fr, i, 1))
             except queue.Full:
                 print('%s: frame "%s" lost on interface %d' % (self, m_fr, i))
                 pass

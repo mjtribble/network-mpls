@@ -90,9 +90,14 @@ class Link:
                           % (
                           self, pkt_S, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time(),
                           intf_a.out_queue.qsize()))
+                    
                     #iterates through a queue and prints the priorities
+
                     for element in list(intf_a.out_queue.queue):
-                        print ('\t' + element[6:7])
+                        if element[0:1] is 'N':
+                            print('\t' + element[7:8])
+                        else:
+                            print ('\t' + element[14:15])
                     # uncomment the lines below to see waiting time until next transmission
                 #                 else:
                 #                     print('%s: waiting to transmit packet on %s %s -> %s, %s for another %f milliseconds' % (self, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time()))
