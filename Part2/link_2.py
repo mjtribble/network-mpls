@@ -85,10 +85,14 @@ class Link:
                     intf_a.next_avail_time = time.time() + pkt_size / intf_a.capacity
                     print('%s: transmitting frame "%s" on %s %s -> %s %s \n' \
                           ' - seconds until the next available time %f\n' \
-                          ' - queue size %d' \
+                          ' - queue size %d\n' \
+                          ' - priorities:' \
                           % (
                           self, pkt_S, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time(),
                           intf_a.out_queue.qsize()))
+                    #iterates through a queue and prints the priorities
+                    for element in list(intf_a.out_queue.queue):
+                        print ('\t' + element[6:7])
                     # uncomment the lines below to see waiting time until next transmission
                 #                 else:
                 #                     print('%s: waiting to transmit packet on %s %s -> %s, %s for another %f milliseconds' % (self, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time()))
