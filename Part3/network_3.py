@@ -9,7 +9,7 @@ class Interface:
     #  @param capacity - the capacity of the link in bps
     def __init__(self, maxsize=0, capacity=500):
         self.in_queue = queue.Queue(maxsize)
-        self.out_queue = []
+        self.out_priority_queue = queue.PriorityQueue(maxsize)
         self.capacity = capacity  # serialization rate
         self.next_avail_time = 0  # the next time the interface can transmit a packet
 
@@ -23,20 +23,9 @@ class Interface:
                 #     print('getting packet from the IN queue')
                 return pkt_S
             else:
-                pkt_S = self.out_queue[0]
-                # if the packet is a MPLS frame
-                if pkt_S[:1] == 'M':
-                    # forward higher priority packets first
-                    try:
-                        for pk in self.out_queue:
-                            if int(pkt_S[1:3]) % 2 == 0:
-                                self.out_queue.remove(pk)
-                                return pkt_S
-                    except:
-                        self.out_queue.remove(pkt_S)
-                        return pkt_S
-                self.out_queue.remove(pkt_S)
-        except queue.Empty or not self.out_queue:
+                pkt_S = self.out_priority_queue.get(False)
+                return pkt_S[1]
+        except queue.Empty or not self.out_priority_queue:
             return None
 
     # put the packet into the interface queue
@@ -45,8 +34,22 @@ class Interface:
     # @param block - if True, block until room in queue, if False may throw queue.Full exception
     def put(self, pkt, in_or_out, block=False):
         if in_or_out == 'out':
+            pkt_S = LinkFrame.from_byte_S(pkt)
+            priority = None
+            if pkt_S.type_S == 'MPLS':
+                data = MPLSFrame.from_byte_S(pkt_S.data_S)
+                priority = int(data.label)
+            elif pkt_S.type_S == 'Network':
+                data = NetworkPacket.from_byte_S(pkt_S.data_S)
+                priority = int(data.priority)
+            else:
+                print("LinkFrame has an invalid label. Neither N or M.")
+
+            # have to make priority negative because PriorityQueue pulls lowest values first. We want the highest values
+            self.out_priority_queue.put((-priority, pkt), block)
+
             # print('putting packet in the OUT queue')
-            self.out_queue.append(pkt)
+            # self.out_priority_queue.put(pkt, block)
         else:
             # print('putting packet in the IN queue')
             self.in_queue.put(pkt, block)
@@ -234,15 +237,15 @@ class Router:
         def get_label(x):
             if priority == 1:
                 return {
-                    'H1': 10,
-                    'H2': 20,
-                    'H3': 30
+                    'H1': '11',
+                    'H2': '22',
+                    'H3': '33'
                 }[x]
             elif priority == 0:
                 return {
-                    'H1': 11,
-                    'H2': 21,
-                    'H3': 31
+                    'H1': '01',
+                    'H2': '02',
+                    'H3': '03'
                 }[x]
             else:
                 print('Priority %s is not covered', priority)
@@ -266,7 +269,7 @@ class Router:
     #  @param i Incoming interface number for the frame
     def process_MPLS_frame(self, m_fr, i):
 
-        label = str(m_fr.label)
+        label = m_fr.label
         destination = m_fr.dst
 
         print('%s: processing MPLS frame "%s"' % (self, m_fr))

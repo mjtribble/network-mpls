@@ -71,7 +71,7 @@ class Link:
                  (self.node_2, self.node_2_intf, self.node_1, self.node_1_intf)]:
             intf_a = node_a.intf_L[node_a_intf]
             intf_b = node_b.intf_L[node_b_intf]
-            if not intf_a.out_queue:
+            if intf_a.out_priority_queue.empty():
                 continue  # continue if no packet to transfer
             # otherwise try transmitting the packet
             try:
@@ -85,26 +85,32 @@ class Link:
                     # update the next free time of the interface according to serialization delay
                     pkt_size = len(pkt_S) * 8  # assuming each character is 8 bits
                     intf_a.next_avail_time = time.time() + pkt_size / intf_a.capacity
+                    priorities = []
+                    for tuple_element in list(intf_a.out_priority_queue.queue):
+                        # checks to see if packet is a network packet or mpls frame
+                        # will print the priority based on which on it is
+                        element = tuple_element[1]
+                        if element[0:1] is 'N':
+                            priorities.append(element[7:8])
+                        else:
+                            priorities.append(element[11:12])
+                            # uncomment the lines below to see waiting time until next transmission
+                            # else:
+                            #     print('%s: waiting to transmit packet on %s %s -> %s, %s for another %f milliseconds'
+                            #  % (self, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time()))
+
                     print('%s: transmitting frame "%s" on %s %s -> %s %s \n'
                           ' - seconds until the next available time %f\n'
                           ' - queue size %d\n'
-                          ' - priorities:'
+                          ' - priorities:%s'
                           % (
                               self, pkt_S, node_a, node_a_intf, node_b, node_b_intf,
                               intf_a.next_avail_time - time.time(),
-                              len(intf_a.out_queue)))
+                              intf_a.out_priority_queue.qsize(),
+                              priorities))
 
                     # iterates through a queue and prints the priorities
-                    for element in intf_a.out_queue:
-                        # checks to see if packet is a network packet or mpls frame
-                        # will print the priority based on which on it is
-                        if element[0:1] is 'N':
-                            print('\t' + element[7:8])
-                        else:
-                            print('\t' + element[11:12])
-                            # uncomment the lines below to see waiting time until next transmission
-                            #                 else:
-                            #                     print('%s: waiting to transmit packet on %s %s -> %s, %s for another %f milliseconds' % (self, node_a, node_a_intf, node_b, node_b_intf, intf_a.next_avail_time - time.time()))
+
             except queue.Full:
                 print('%s: packet lost' % self)
                 pass

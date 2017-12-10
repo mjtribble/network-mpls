@@ -32,27 +32,27 @@ if __name__ == '__main__':
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
-    frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 1],
-                   '11': ['10', 'H1', 0, 1],
-                   '31': ['30', 'H3', 1, 1]}
+    frwd_tbl_DA = {'01': ['01', 'H1', 0, 1],
+                   '03': ['03', 'H3', 1, 1],
+                   '11': ['11', 'H1', 0, 1],
+                   '33': ['33', 'H3', 1, 1]}
 
-    frwd_tbl_DB = {'10': ['10', 'RA', 0, 1],
-                   '30': ['30', 'RD', 1, 0],
-                   '11': ['10', 'RA', 0, 1],
-                   '31': ['30', 'RD', 1, 0]
+    frwd_tbl_DB = {'01': ['01', 'RA', 0, 1],
+                   '03': ['03', 'RD', 1, 0],
+                   '11': ['11', 'RA', 0, 1],
+                   '33': ['33', 'RD', 1, 0]
                    }
 
-    frwd_tbl_DC = {'10': ['10', 'RA', 0, 1],
-                   '30': ['30', 'RD', 1, 0],
-                   '11': ['10', 'RA', 0, 1],
-                   '31': ['30', 'RD', 1, 0]
+    frwd_tbl_DC = {'01': ['01', 'RA', 0, 1],
+                   '03': ['03', 'RD', 1, 0],
+                   '11': ['11', 'RA', 0, 1],
+                   '33': ['33', 'RD', 1, 0]
                    }
 
-    frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 1],
-                   '11': ['10', 'H1', 0, 1],
-                   '31': ['30', 'H3', 1, 1]
+    frwd_tbl_DD = {'01': ['01', 'H1', 0, 1],
+                   '03': ['03', 'H3', 1, 1],
+                   '11': ['11', 'H1', 0, 1],
+                   '33': ['33', 'H3', 1, 1]
                    }
 
     # table used to decapsulate network packets from MPLS frames
@@ -117,15 +117,15 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    # for i in range(5):
-    #     priority = i % 2
-    #     host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % i, priority)
-    # for i in range(2):
-    #     priority = i % 2
-    #     host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % i, priority)
+    for i in range(5):
+        priority = i % 2
+        host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % i, priority)
+    for i in range(2):
+        priority = i % 2
+        host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % i, priority)
 
     # host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 0, 0)
-    host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 1, 1)
+    # host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 1, 1)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)
