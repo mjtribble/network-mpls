@@ -32,17 +32,21 @@ if __name__ == '__main__':
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
-    frwd_tbl_DA = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 1]}
+    frwd_tbl_DA = {'01': ['01', 'H3', 3, 1],
+                   '02': ['02', 'H3', 2, 1]
+                   }
 
-    frwd_tbl_DB = {'10': ['10', 'RA', 0, 1],
-                   '30': ['30', 'RD', 1, 0]}
+    frwd_tbl_DB = {'01': ['01', 'H3', 1, 0],
+                   '02': ['02', 'H3', 1, 0]
+                   }
 
-    frwd_tbl_DC = {'10': ['10', 'RA', 0, 1],
-                   '30': ['30', 'RD', 1, 0]}
+    frwd_tbl_DC = {'01': ['01', 'H3', 1, 0],
+                   '02': ['02', 'H3', 1, 0]
+                   }
 
-    frwd_tbl_DD = {'10': ['10', 'H1', 0, 1],
-                   '30': ['30', 'H3', 1, 1]}
+    frwd_tbl_DD = {'01': ['01', 'H3', 1, 0],
+                   '02': ['02', 'H3', 1, 0]
+                   }
 
     # table used to decapsulate network packets from MPLS frames
     # {destination: last hop router}
@@ -51,7 +55,7 @@ if __name__ == '__main__':
                    'H3': 'RD'}
 
     router_a = Router(name='RA',
-                      intf_capacity_L=[500, 100],
+                      intf_capacity_L=[500, 500, 500, 500],
                       encap_tbl_D=encap_tbl_D,
                       frwd_tbl_D=frwd_tbl_DA,
                       decap_tbl_D=decap_tbl_D,
@@ -59,7 +63,7 @@ if __name__ == '__main__':
     object_L.append(router_a)
 
     router_b = Router(name='RB',
-                      intf_capacity_L=[500, 100],
+                      intf_capacity_L=[500, 500],
                       encap_tbl_D=encap_tbl_D,
                       frwd_tbl_D=frwd_tbl_DB,
                       decap_tbl_D=decap_tbl_D,
@@ -67,7 +71,7 @@ if __name__ == '__main__':
     object_L.append(router_b)
 
     router_c = Router(name='RC',
-                      intf_capacity_L=[500, 100],
+                      intf_capacity_L=[500, 500],
                       encap_tbl_D=encap_tbl_D,
                       frwd_tbl_D=frwd_tbl_DC,
                       decap_tbl_D=decap_tbl_D,
@@ -88,12 +92,10 @@ if __name__ == '__main__':
 
     # add all the links - need to reflect the connectivity in cost_D tables above
     link_layer.add_link(Link(host_1, 0, router_a, 0))
-    link_layer.add_link(Link(router_a, 1, router_b, 0))
+    link_layer.add_link(Link(host_2, 0, router_a, 1))
+    link_layer.add_link(Link(router_a, 3, router_b, 0))
+    link_layer.add_link(Link(router_a, 2, router_c, 0))
     link_layer.add_link(Link(router_b, 1, router_d, 0))
-    link_layer.add_link(Link(router_d, 1, host_3, 0))
-
-    link_layer.add_link(Link(host_2, 0, router_a, 0))
-    link_layer.add_link(Link(router_a, 1, router_c, 0))
     link_layer.add_link(Link(router_c, 1, router_d, 0))
     link_layer.add_link(Link(router_d, 1, host_3, 0))
 

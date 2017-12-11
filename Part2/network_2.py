@@ -221,17 +221,17 @@ class Router:
 
         destination = pkt.dst
         label = None
+        interface = i
 
         # Todo: extend this in part 3 when dealing with priority. Change label to look at destination and priority
         # creates a numerical label for the MPLSFrame to check in the MPLS forwarding table
-        if destination == 'H1':
-            label = 10
-        if destination == 'H2':
-            label = 20
-        if destination == 'H3':
-            label = 30
-        else:
-            print('Invalid destination', destination)
+        if interface == 0:
+            label = '01'
+        if interface == 1:
+            label = '02'
+
+
+
         # checks the encapsulation table to see if this is the first hop based on the current router and the destination
         if self.encap_tbl_D[destination] is self.name:
 
