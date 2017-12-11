@@ -23,9 +23,11 @@ class Interface:
                 #     print('getting packet from the IN queue')
                 return pkt_S
             else:
+                # an out interface is a priority queue in tuple form ( priority, data )
+                #  hence returning pkt_s[1] only the pkt data
                 pkt_S = self.out_priority_queue.get(False)
                 return pkt_S[1]
-        except queue.Empty or not self.out_priority_queue:
+        except queue.Empty:
             return None
 
     # put the packet into the interface queue
@@ -33,9 +35,12 @@ class Interface:
     # @param in_or_out - use 'in' or 'out' interface
     # @param block - if True, block until room in queue, if False may throw queue.Full exception
     def put(self, pkt, in_or_out, block=False):
+
+        # if it's an out queue, add to the priority queue based with the label, or priority attached
         if in_or_out == 'out':
             pkt_S = LinkFrame.from_byte_S(pkt)
             priority = None
+
             if pkt_S.type_S == 'MPLS':
                 data = MPLSFrame.from_byte_S(pkt_S.data_S)
                 priority = int(data.label)
@@ -234,7 +239,8 @@ class Router:
         interface = i
 
         # creates a numerical label for the MPLSFrame to check in the MPLS forwarding table
-        # make the lower priority jobs negative so high priority are forwarded first
+        # make the lower priority jobs lower integers so high priority are forwarded first
+        # depending on which interface a packet comes in on, it's label will be different for the MPLS fwd table
         def get_label(x):
             if priority == 1:
                 return {
