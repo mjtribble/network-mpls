@@ -32,27 +32,27 @@ if __name__ == '__main__':
 
     # tables used to forward MPLS frames
     # { in-label: [ out-label, destination, out-interface, in-interface ]
-    frwd_tbl_DA = {'01': ['01', 'H1', 0, 1],
-                   '03': ['03', 'H3', 1, 1],
-                   '11': ['11', 'H1', 0, 1],
-                   '33': ['33', 'H3', 1, 1]}
+    frwd_tbl_DA = {'01': ['01', 'H3', 3, 1],
+                   '02': ['02', 'H3', 2, 1],
+                   '11': ['11', 'H3', 3, 1],
+                   '22': ['22', 'H3', 2, 1]}
 
-    frwd_tbl_DB = {'01': ['01', 'RA', 0, 1],
-                   '03': ['03', 'RD', 1, 0],
-                   '11': ['11', 'RA', 0, 1],
-                   '33': ['33', 'RD', 1, 0]
+    frwd_tbl_DB = {'01': ['01', 'H3', 1, 0],
+                   '02': ['02', 'H3', 1, 0],
+                   '11': ['11', 'H3', 1, 0],
+                   '22': ['22', 'H3', 1, 0]
                    }
 
-    frwd_tbl_DC = {'01': ['01', 'RA', 0, 1],
-                   '03': ['03', 'RD', 1, 0],
-                   '11': ['11', 'RA', 0, 1],
-                   '33': ['33', 'RD', 1, 0]
+    frwd_tbl_DC = {'01': ['01', 'H3', 1, 0],
+                   '02': ['02', 'H3', 1, 0],
+                   '11': ['11', 'H3', 1, 0],
+                   '22': ['22', 'H3', 1, 0]
                    }
 
-    frwd_tbl_DD = {'01': ['01', 'H1', 0, 1],
-                   '03': ['03', 'H3', 1, 1],
-                   '11': ['11', 'H1', 0, 1],
-                   '33': ['33', 'H3', 1, 1]
+    frwd_tbl_DD = {'01': ['01', 'H3', 0, 1],
+                   '02': ['02', 'H3', 1, 1],
+                   '11': ['11', 'H3', 0, 1],
+                   '22': ['22', 'H3', 1, 1]
                    }
 
     # table used to decapsulate network packets from MPLS frames
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                    'H3': 'RD'}
 
     router_a = Router(name='RA',
-                      intf_capacity_L=[500, 500],
+                      intf_capacity_L=[500, 500, 500, 500],
                       encap_tbl_D=encap_tbl_D,
                       frwd_tbl_D=frwd_tbl_DA,
                       decap_tbl_D=decap_tbl_D,
@@ -99,12 +99,10 @@ if __name__ == '__main__':
 
     # add all the links - need to reflect the connectivity in cost_D tables above
     link_layer.add_link(Link(host_1, 0, router_a, 0))
-    link_layer.add_link(Link(router_a, 1, router_b, 0))
+    link_layer.add_link(Link(host_2, 0, router_a, 1))
+    link_layer.add_link(Link(router_a, 3, router_b, 0))
+    link_layer.add_link(Link(router_a, 2, router_c, 0))
     link_layer.add_link(Link(router_b, 1, router_d, 0))
-    link_layer.add_link(Link(router_d, 1, host_3, 0))
-
-    link_layer.add_link(Link(host_2, 0, router_a, 0))
-    link_layer.add_link(Link(router_a, 1, router_c, 0))
     link_layer.add_link(Link(router_c, 1, router_d, 0))
     link_layer.add_link(Link(router_d, 1, host_3, 0))
 
@@ -117,15 +115,15 @@ if __name__ == '__main__':
         t.start()
 
     # create some send events
-    for i in range(5):
-        priority = i % 2
-        host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % i, priority)
-    for i in range(2):
-        priority = i % 2
-        host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % i, priority)
+    # for i in range(5):
+    #     priority = i % 2
+    #     host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % i, priority)
+    # for i in range(2):
+    #     priority = i % 2
+    #     host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % i, priority)
 
-    # host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 0, 0)
-    # host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 1, 1)
+    host_1.udt_send('H3', 'MESSAGE_%d_FROM_H1' % 0, 0)
+    host_2.udt_send('H3', 'MESSAGE_%d_FROM_H2' % 1, 1)
 
     # give the network sufficient time to transfer all packets before quitting
     time.sleep(simulation_time)

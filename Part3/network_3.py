@@ -231,26 +231,25 @@ class Router:
 
         destination = pkt.dst
         priority = int(pkt.priority)
+        interface = i
 
         # creates a numerical label for the MPLSFrame to check in the MPLS forwarding table
         # make the lower priority jobs negative so high priority are forwarded first
         def get_label(x):
             if priority == 1:
                 return {
-                    'H1': '11',
-                    'H2': '22',
-                    'H3': '33'
+                    0: '11',
+                    1: '22',
                 }[x]
             elif priority == 0:
                 return {
-                    'H1': '01',
-                    'H2': '02',
-                    'H3': '03'
+                    0: '01',
+                    1: '02',
                 }[x]
             else:
                 print('Priority %s is not covered', priority)
 
-        label = get_label(str(destination))
+        label = get_label(interface)
 
         # checks the encapsulation table to see if this is the first hop based on the current router and the destination
         if self.encap_tbl_D[destination] is self.name:
